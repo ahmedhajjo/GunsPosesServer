@@ -3,18 +3,16 @@
   "version": "0.0.0",
   "description": "TestinngNodeJs",
   "main": "app.js",
-  "scripts": {
-    "start" : "node server.js"
-  },
   "author": {
     "name": ""
-    
   },
-  
   "dependencies": {
     "socket.io": "^2.2.0",
     "uuid": "3.3.2",
     "shortid": "2.2.14",
     "heroku": "7.26.2"
+  },
+  "scripts": {
+    "start" : "node server.js"
   }
 }

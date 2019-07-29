@@ -2,7 +2,12 @@
 // ws://127.0.0.1:80/socket.io/?EIO=4&transport=websocket
 //ws://virtual-creativity.herokuapp.com:80/socket.io/?EIO=4&transport=websocket
 
-var io = require('socket.io') (process.env.PORT || 80);
+
+var express = require('express');
+var app = express();
+var http = require('http').Server(app);
+var io = require('socket.io')(http); 
+
 var uuid = require('uuid');
 var shortId = require('shortid');
 
@@ -39,6 +44,13 @@ io.on('connection',function(socket){
         console.log('ClientDisconnected');
         playerCount--;
     });
+
+    app.listen(process.env.PORT || 80,function(){
+        console.log('listening on 80')
+    });
+    console.log("---------------Running Server----------------"); 
 }) 
+
+
 
  
