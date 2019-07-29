@@ -2,11 +2,12 @@
 // ws://127.0.0.1:80/socket.io/?EIO=4&transport=websocket
 //ws://virtual-creativity.herokuapp.com:80/socket.io/?EIO=4&transport=websocket
 //ws://guns-poses.herokuapp.com
+//ws://guns-poses.herokuapp.com:80/socket.io/?EIO=4&transport=websocket
 
-var express = require('express');
-var app = express();
-var http = require('http').Server(app);
-var io = require('socket.io')(http); 
+// var express = require('express');
+// var app = express();
+// var http = require('http').Server(app);
+var io = require('socket.io')(process.env.PORT || 80); 
 
 var uuid = require('uuid');
 var shortId = require('shortid');
@@ -45,10 +46,10 @@ io.on('connection',function(socket){
         playerCount--;
     });
 
-    http.listen(process.env.PORT || 80,function(){
-        console.log('listening on 80')
-    });
-    console.log("---------------Running Server----------------"); 
+    // app.listen(process.env.PORT || 80,function(){
+    //     console.log('listening on 80')
+    // });
+    // console.log("---------------Running Server----------------"); 
 }) 
 
 
