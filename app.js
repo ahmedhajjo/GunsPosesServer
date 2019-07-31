@@ -1,5 +1,5 @@
 
-// ws://127.0.0.1:80/socket.io/?EIO=4&transport=websocket
+//ws://127.0.0.1:80/socket.io/?EIO=4&transport=websocket
 //ws://virtual-creativity.herokuapp.com:80/socket.io/?EIO=4&transport=websocket
 //ws://guns-poses.herokuapp.com
 //ws://guns-poses.herokuapp.com:80/socket.io/?EIO=4&transport=websocket
@@ -15,10 +15,11 @@ var shortId = require('shortid');
 
 console.log('Hello world');
 var playerCount = 0;
-var thisClient = shortId.generate();
+
 
 
 io.on('connection',function(socket){
+    var thisClient = shortId.generate();
     console.log('client connected , brodcasting spawn , id:', thisClient); 
 
 
@@ -33,7 +34,7 @@ io.on('connection',function(socket){
     
 
     socket.on('move', function(data){
-       data.id = thisClient;
+        data.id = thisClient;
         console.log('client moved',JSON.stringify(data));
      
         socket.broadcast.emit('move', data);
