@@ -13,6 +13,6 @@
     "heroku": "7.26.2"
   },
   "scripts": {
-    "start" : "node server.js"
+    "start" : "node app.js"
   }
 }
