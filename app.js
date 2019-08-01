@@ -27,9 +27,15 @@ io.on('connection',function(socket){
     
     
      players.forEach(function(PlayerId){
+
+        if(PlayerId == thisClient)
+        return;
+
         socket.emit('spawn', {id:PlayerId});
         console.log('sending spawn to new player', PlayerId);
      });
+
+     
 
 
     socket.on('move', function(data){
@@ -43,7 +49,9 @@ io.on('connection',function(socket){
     socket.on('disconnect', function()
     {
         console.log('ClientDisconnected');
-        playerCount--;
+        players.splice(players.indexOf(thisClient),1);
+        socket.broadcast.emit('disconnected', {id: thisClient});
+
     });
 
     // app.listen(process.env.PORT || 80,function(){
