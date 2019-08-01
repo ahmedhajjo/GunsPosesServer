@@ -8,30 +8,29 @@
 // var app = express();
 // var http = require('http').Server(app);
 var io = require('socket.io')(process.env.PORT || 80); 
+var mongoose = require('mongoose');
 
 var uuid = require('uuid');
 var shortId = require('shortid');
-
+var players = [];
 
 console.log('Hello world');
-var playerCount = 0;
+
 
 
 
 io.on('connection',function(socket){
     var thisClient = shortId.generate();
+    players.push(thisClient);
     console.log('client connected , brodcasting spawn , id:', thisClient); 
-
-
     socket.broadcast.emit('spawn', {id: thisClient});
-    playerCount++;
-
-    for(i=0; i < playerCount; i++)
-    {
-        socket.emit('spawn');
-        console.log('sending spawn to new player');
-    }
     
+    
+     players.forEach(function(PlayerId){
+        socket.emit('spawn', {id:PlayerId});
+        console.log('sending spawn to new player', PlayerId);
+     });
+
 
     socket.on('move', function(data){
         data.id = thisClient;
@@ -52,6 +51,14 @@ io.on('connection',function(socket){
     // });
     // console.log("---------------Running Server----------------"); 
 }) 
+
+mongoose.connect('mongodb://localhost/mongoose_basics', function (err) {
+ 
+   if (err) throw err;
+ 
+   console.log('Successfully connected');
+ 
+});
 
 
 
