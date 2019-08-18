@@ -1,3 +1,0 @@
-C:\Users\GT72S\source\repos\TestinngNodeJs\TestinngNodeJs\obj\Debug\TestinngNodeJs.njsprojAssemblyReference.cache
-C:\Users\GT72S\source\repos\TestinngNodeJs\TestinngNodeJs\obj\Debug\TestinngNodeJs.njsproj.CoreCompileInputs.cache
-C:\Users\GT72S\source\repos\TestinngNodeJs\TestinngNodeJs\bin\Microsoft.NodejsTools.WebRole.dll

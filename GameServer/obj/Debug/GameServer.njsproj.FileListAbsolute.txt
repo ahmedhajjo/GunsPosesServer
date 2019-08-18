@@ -1,0 +1,3 @@
+C:\Users\GT72S\source\repos\GameServer\GameServer\obj\Debug\GameServer.njsprojAssemblyReference.cache
+C:\Users\GT72S\source\repos\GameServer\GameServer\obj\Debug\GameServer.njsproj.CoreCompileInputs.cache
+C:\Users\GT72S\source\repos\GameServer\GameServer\bin\Microsoft.NodejsTools.WebRole.dll
