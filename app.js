@@ -7,17 +7,17 @@
 'use strict';
 var express = require('express');
 var uuid = require('uuid');
-var mangoose = require('mongoose');
+var mongoose = require('mongoose');
 var app = express();
 const bodyParser = require('body-parser');
 var io = require('socket.io') (process.env.PORT || 7000);
-require('dotenv/config');
+//require('dotenv/config');
 
 app.use(bodyParser.json());
 
 //import routes
-const postsRoute = require('./Routes/posts');
-app.use('/players', postsRoute);
+//const postsRoute = require('./Routes/posts');
+//app.use('/players', postsRoute);
 app.use(express.urlencoded());
 
 var pendingMatch = 0;
@@ -25,6 +25,54 @@ var players = [];
 var listQ = [];
 var matches = [];
 var playerId;
+
+var listMCQ = [];
+var ready=[];
+
+
+//-------------------------------- Mongoose functions -----------------------------------------------------------
+var db= mongoose.connection;
+
+//Connect Mongoose 
+mongoose.connect('mongodb://localhost:27017/test', { useNewUrlParser: true });
+
+var PlayerSchema = new mongoose.Schema({
+    id: String,
+    name: String,
+    topScoer:Number,
+    gun: Number 
+  });
+
+  var QuestioonSchema = new mongoose.Schema({
+    text: String,
+    type: Number,
+    Ans: {}
+    
+  });
+
+
+var Player = mongoose.model('player', PlayerSchema);
+var Question = mongoose.model('Question', QuestioonSchema);
+
+// var q= new Question();
+// q.text="gamestartedtyping";
+// q.type=0;
+// q.save();
+
+
+Question.find({"type":0},(r,res)=>{
+    listQ=res;
+})
+
+Question.find({"type":1},(r,res)=>{
+    listMCQ=res;
+})
+
+//------------------------------------------------------------------------------------------------
+
+
+
+
 
 
 
@@ -35,15 +83,11 @@ io.on('connection',function(socket){
 
     console.log('client connected' +  socket); 
 
-    socket.on('joinedGame' , function(){
-        
- 
+    socket.on('joinedGame' , function(data){
+    
         playerId =  uuid();
         players[playerId] = {conSocket : socket, matchId : null};
-    
         socket.emit('returnID', {'id': playerId});
-
-
     });
 
 
@@ -76,11 +120,22 @@ io.on('connection',function(socket){
 
 
     socket.on('FinishedTask', function(data) {
-        console.log('stage over');
-        players[matches[data.matchID].playerA].conSocket.emit('stageFinishMsg', {'id' : data.id});
-        players[matches[data.matchID].playerB].conSocket.emit('stageFinishMsg', {'id' : data.id});
+        if(matches[data.matchID]!=null){
+            players[matches[data.matchID].playerA].conSocket.emit('stageFinishMsg', {'id' : data.id});
+            players[matches[data.matchID].playerB].conSocket.emit('stageFinishMsg', {'id' : data.id});    
+        }
      
     });
+
+    // socket.on('ShootPlayer', function(data) {
+    //     console.log('Shoot the enemy!');
+    //     players[matches[data.matchID].playerA].conSocket.emit('stageFinishMsg', {'id' : data.id});
+    //     players[matches[data.matchID].playerB].conSocket.emit('stageFinishMsg', {'id' : data.id});
+     
+    // });
+
+    
+    
 
 
 }) 
@@ -96,72 +151,34 @@ function StartGame(lobbyID)
 
 
 
-listQ.push({
-    type: 0,
-    text: 'something to write'
-});
-
-listQ.push({
-    type: 0,
-    text: 'something something55'
-});
-
-listQ.push({
-
-    type: 0,
-    text: 'something something 231'
-})
-
-listQ.push({
-
-    type: 0,
-    text: '11+1'
-
-})
-
-listQ.push({
-    type: 1,
-    text: '1 + 1 = 1?'
-   
-});
-
-listQ.push({
-    type: 1,
-    text: 'something something55'
-});
-
-listQ.push({
-
-    type: 1,
-    text: 'something something 231'
-})
-
-listQ.push({
-
-    type: 1,
-    text: '11+1'
-
-})
+//-------------------------------- Express functions --------------------------------
 
 
-var listMCQ = [];
-var ready=[];
-listMCQ.push();
-
-
-app.get('/question/:id', function (req, res) {
+app.get('/question/:id/:roundID', function (req, res) {
+    
     console.log(req.params.id);
     var id = req.params.id;
+    var playerRoundID = req.params.roundID;
+    console.log("Question caller | round id : " + playerRoundID);
     console.log('Request ID : ', id);
     var match = matches[id];
-    if (match.round == 0) {
-        if (match.rand == -1) {
-            
-            match.rand = parseInt(Math.random() * listQ.length);
+
+    if (playerRoundID == 0) {
+        if (match.TypingQId == -1) {
+            match.TypingQId = parseInt(Math.random() * listQ.length);
         }
-        res.write(JSON.stringify(listQ[match.rand]));
-        console.log(listQ[match.rand].text);
+        res.write(JSON.stringify(listQ[match.TypingQId].text));
+        console.log(listQ[match.TypingQId].text);
     }
+
+    if (playerRoundID == 1) {
+        if (match.MCQId == -1) {
+            match.MCQId = parseInt(Math.random() * listMCQ.length);
+        }
+        res.write(JSON.stringify(listMCQ[match.MCQId].text  + '|' + listMCQ[match.MCQId].Ans));
+        console.log(listMCQ[match.MCQId].text  + '|' + listMCQ[match.MCQId].Ans);
+    }
+ 
     res.send();
 
 });
@@ -196,24 +213,6 @@ console.log("player of id" + req.body.id + " says ready... ");
     res.send();
 });
 
-    
-app.get('/IsLobbyAlive/:id', function (req, res) {
-    
-    var readyState = ready[req.params.id];
-    console.log('lobby player count : ' + readyState);
-    let lobbyState = 'inactive';
-    
-    if(readyState==2){
-        lobbyState = 'active';
-        res.send(lobbyState);
-    }
-
-    else {
-        res.send(lobbyState);
-    }
-});
-
-    
 app.get('/IsLobbyAlive/:id', function (req, res) {
     
     var readyState = ready[req.params.id];
@@ -246,7 +245,7 @@ app.post('/Disconnect', function (req, res) {
 app.post('/CreateMatch/', function (req, res) {
         if (pendingMatch == 0) {
             pendingMatch = uuid();
-            matches[pendingMatch] = {round:0,rand:-1, shot : false, shooterID : undefined, playerA : req.body.id, playerB : null};
+            matches[pendingMatch] = {round:0, TypingQId:-1, MCQId:-1, shot : false, shooterID : undefined, playerA : req.body.id, playerB : null};
             players[req.body.id].matchId = pendingMatch;
             console.log("Player A ID : " + req.body.id);
             res.write(JSON.stringify({"lobbyId" : pendingMatch, "playerId" : 'A'}));
@@ -263,18 +262,29 @@ app.post('/CreateMatch/', function (req, res) {
             res.send();
     
 });
-        
-app.get('/StateUpdate', function (req, res) {});
+      
+app.post('/Player/', function (req,res) {
+    var id=req.body.id;
+    var player= Player.findOne({"id":id},(err,res)=>{
+        if(req.body.name){
+            res.name=req.body.name;
 
-app.get('/Shoot', function (req, res) {});
+        }
+        if(req.body.score){
+            res.score=req.body.score;
+        }
+        res.save();
+    });
+
+
+    res.send();
+});
+
+//-------------------------------------------------------------------------------------------
 
 
 
-//Connect Mongoose 
-mangoose.connect(process.env.DB_CONNECITON,
-{ useNewUrlParser: true }, () => 
-console.log('Connected to DataBase!')
-);
+
 
 
 app.listen(4000);
