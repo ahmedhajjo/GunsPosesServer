@@ -1,2 +1,0 @@
-# AmityTestServer
-Hackathon Server
