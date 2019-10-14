@@ -15,9 +15,7 @@ var io = require('socket.io') (process.env.PORT || 7000);
 
 app.use(bodyParser.json());
 
-//import routes
-//const postsRoute = require('./Routes/posts');
-//app.use('/players', postsRoute);
+
 app.use(express.urlencoded());
 
 var pendingMatch = 0;
@@ -67,6 +65,14 @@ Question.find({"type":0},(r,res)=>{
 Question.find({"type":1},(r,res)=>{
     listMCQ=res;
 })
+
+
+var PlayersID = new player();
+PlayersID.id = i
+PlayersID.save(function (err) {
+  if (err) return handleError(err);
+ 
+});
 
 //------------------------------------------------------------------------------------------------
 
